@@ -1,0 +1,32 @@
+{
+  "name": "suggestion-box",
+  "version": "1.0.0",
+  "description": "Users post suggestions and comments on heir favourite products.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yanguya995/suggestion-box.git"
+  },
+  "author": "Njabulo Richard Thwala & Vincent Tshabalala",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yanguya995/suggestion-box/issues"
+  },
+  "homepage": "https://github.com/Yanguya995/suggestion-box#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "bower": "^1.8.2",
+    "cors": "^2.8.4",
+    "express": "^4.15.4",
+    "hoek": "^4.2.0",
+    "jsonwebtoken": "^7.4.3",
+    "mongoose": "^4.11.9",
+    "mongoose-deep-populate": "^3.0.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^3.0.0"
+  }
+}
