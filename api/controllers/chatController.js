@@ -3,7 +3,7 @@ var Chat = mongoose.model('Chats');
 
 exports.list_all_chats = function (req, res) {
     Chat.find()
-        .populate({path: 'likes', model:'Avatars'})
+        .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({
             path: 'post',
@@ -60,7 +60,7 @@ exports.update_a_chat = function (req, res) {
             res.send("There was an error");
         }
         else {
-            res.json({ "Suceess": "The chat has been updated" });
+            this.view_a_chat
         }
     })
 }

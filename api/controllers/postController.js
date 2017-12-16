@@ -21,7 +21,6 @@ exports.view_a_post = function (req, res) {
 }
 
 exports.create_new_post = function (req, res) {
-    console.log("here");
     var new_post = new Post(req.body);
     new_post.save(function (err, post) {
         if (err)
@@ -39,14 +38,12 @@ exports.create_new_post = function (req, res) {
                                     return handleError(err)
                                 else if (chat !== null) {
                                     chat.post.push(new_post);
-                                    chat.save(function (err) {
-                                        if (err)
-                                            return handleError(err)
-                                        else if (!err) {
-                                            res.json({
-                                                message: 'Post created',
-                                                status: 'Success'
-                                            });
+                                    chat.save(function (err, populate_chat) {
+                                        if (err) {
+                                            console.log(err)
+                                            res.send("There was an error");
+                                        } else {
+                                            res.json(populate_chat)
                                         }
                                     });
                                 }

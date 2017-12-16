@@ -24,13 +24,13 @@ var strategy = new jwtStrategy(jwtOptions, function (jwt_payload, next) {
         next(null, user)
     } else {
         next,
-        (null, false);
+            (null, false);
     }
 });
 exports.authenticate = function (req, res) {
     User.findOne({
-            email: req.body.username
-        },
+        email: req.body.username
+    },
         function (err, user) {
             if (err) {
                 res.send(err)
@@ -76,13 +76,16 @@ function compareToUserPassword(userPassword, bodyPassword) {
         return false;
     }
 }
-
-exports.create_a_user = function(req,res){
+var avatar = require('./avatarController');
+exports.create_a_user = function (req, res) {
     var new_user = new User(req.body);
     console.log(req.body);
-    new_user.save(function(err,user){
-        if(err)
-            res.send(err)
-        res.json({success: true, message: 'user has been created'});
+    new_user.save(function (err, user) {
+        if (err) res.send(err)
+        else {
+            req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
+            req.body.user = user._id;
+            avatar.create_an_avatar(req, res);
+        }
     })
 }
