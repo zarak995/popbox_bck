@@ -1,6 +1,6 @@
+
 var mongoose = require('mongoose');
 var Chat = mongoose.model('Chats');
-
 exports.list_all_chats = function (req, res) {
     Chat.find()
         .populate({ path: 'likes', model: 'Avatars' })
@@ -22,6 +22,7 @@ exports.list_all_chats = function (req, res) {
 }
 exports.view_a_chat = function (req, res) {
     Chat.findById({ _id: req.params.chatId })
+        .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({
             path: 'post', model: 'Posts',
@@ -43,9 +44,10 @@ exports.create_a_chat = function (req, res) {
         if (err)
             res.send(err)
         else {
-            res.json(new_chat);
+            req.params.chatId = chat._id;
+            module.exports.view_a_chat(req, res);
         }
-    });
+    })
 }
 exports.update_a_chat = function (req, res) {
     Chat.findByIdAndUpdate(req.params.chatId, {
@@ -54,15 +56,22 @@ exports.update_a_chat = function (req, res) {
             title: req.body.title,
             likes: req.body.likes
         }
-    }, (err, chat) => {
-        if (err) {
-            console.log(err);
-            res.send("There was an error");
-        }
-        else {
-            this.view_a_chat
-        }
     })
+        .populate({ path: 'owner', model: 'Avatars' })
+        .populate({
+            path: 'post', model: 'Posts',
+            populate: {
+                path: 'avatar',
+                model: 'Avatars'
+            }
+        })
+        .exec((err, chat) => {
+            if (err) res.send(err);
+            else {
+                req.params.chatId = chat._id;
+                module.exports.view_a_chat(req, res)
+            }
+        })
 }
 exports.delete_a_chat = function (req, res) {
     Chat.findByIdAndRemove({

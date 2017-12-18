@@ -2,5 +2,4 @@
 var config = require('../env/config')[env];*/
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost/suggestionBoxDB",{useMongoClient:true}); 
-console.log(mongoose.connection.readyState);
+mongoose.connect("mongodb://localhost:27017/suggestionBoxDB",{useMongoClient:true}); 
