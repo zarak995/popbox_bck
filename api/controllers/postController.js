@@ -9,8 +9,6 @@ exports.list_all_posts = function (req, res) {
         res.json(post);
     });
 }
-
-
 exports.view_a_post = function (req, res) {
     Post.findById({ _id: req.params.postId }, function (err, post) {
         if (err)
@@ -21,8 +19,10 @@ exports.view_a_post = function (req, res) {
 
 exports.create_new_post = function (req, res) {
     console.log(req.body);
-    Chat.findById({ _id: req.body.chat },
-        (err, chat) => {
+    Chat.findById({ _id: req.body.chat })
+        .populate({ path: 'owner', model: 'Avatars' })
+        .populate({ path: 'likes', model: 'Avatars' })
+        .exec((err, chat) => {
             if (err) {
                 console.log(err);
                 res.send("There was an erro saving post");
