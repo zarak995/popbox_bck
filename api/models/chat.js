@@ -1,5 +1,16 @@
 var mongoose = require('mongoose');
-var post = require('./post');
+
+var Post = mongoose.Schema({
+    avatar: Object,
+    createdDate: {
+        type: Date,
+        default: Date.now
+    },
+    body: {
+        type: String,
+        require: true
+    },
+});
 
 var ChatSchema = new mongoose.Schema({
     title: {
@@ -16,10 +27,7 @@ var ChatSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Avatars'
     }],
-    post: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Posts'
-    }],
+    post: [Post],
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Avatars'
@@ -27,7 +35,11 @@ var ChatSchema = new mongoose.Schema({
     createdDate: {
         type: Date,
         default: Date.now
+    },
+    tags: {
+        type: [String]
     }
+
 });
 var Chat = mongoose.model('Chats', ChatSchema);
 module.exports = Chat;

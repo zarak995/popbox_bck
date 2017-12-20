@@ -5,14 +5,6 @@ exports.list_all_chats = function (req, res) {
     Chat.find()
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
-        .populate({
-            path: 'post',
-            model: 'Posts',
-            populate: {
-                path: 'avatar',
-                model: 'Avatars'
-            }
-        })
         .exec((err, chat) => {
             if (err) res.send(err);
             else {

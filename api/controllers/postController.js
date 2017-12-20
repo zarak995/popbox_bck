@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
-var Post = mongoose.model('Posts'),
-    Avatar = mongoose.model('Avatars'),
+Avatar = mongoose.model('Avatars'),
     Chat = mongoose.model('Chats');
 
 exports.list_all_posts = function (req, res) {
@@ -21,39 +20,33 @@ exports.view_a_post = function (req, res) {
 }
 
 exports.create_new_post = function (req, res) {
-    var new_post = new Post(req.body);
-    new_post.save(function (err, post) {
-        if (err)
-            res.send(err);
-        else {
-            var populate = Post.findOne({ _id: new_post._id })
-                .populate('Chats')
-                .exec(function (err) {
-                    if (err)
-                        return handleError(err)
+    console.log(req.body);
+    Chat.findById({ _id: req.body.chat },
+        (err, chat) => {
+            if (err) {
+                console.log(err);
+                res.send("There was an erro saving post");
+            } else {
+                var avatar = Avatar.findById({ _id: req.body.avatar }, function (err, avatar) {
+                    if (err) {
+                        console.log(err)
+                        res.send("There was an error")
+                    }
                     else {
-                        var populateChat = Chat.findOne({ _id: req.body.chat },
-                            function (err, chat) {
-                                if (err)
-                                    return handleError(err)
-                                else if (chat !== null) {
-                                    chat.post.push(new_post);
-                                    chat.save(function (err, populate_chat) {
-                                        if (err) {
-                                            console.log(err)
-                                            res.send("There was an error");
-                                        } else {
-                                            res.json(populate_chat)
-                                        }
-                                    });
-                                }
-                            });
+                        req.body.avatar = avatar;
+                        chat.post = chat.post.concat(req.body);
+                        chat.save(function (err, chat) {
+                            if (err) { console.log(err) }
+                            else {
+                                res.json(chat);
+                            }
+                        })
                     }
                 });
-        }
-    });
-}
 
+            }
+        })
+}
 
 exports.update_a_post = function (req, res) {
     Post.findByIdAndUpdate(req.params.postId, {
