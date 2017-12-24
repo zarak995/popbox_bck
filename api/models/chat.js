@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-
 var Post = mongoose.Schema({
     avatar: Object,
     createdDate: {
@@ -41,5 +40,6 @@ var ChatSchema = new mongoose.Schema({
     }
 
 });
+ChatSchema.index({body :'text', 'post.body':'text'});
 var Chat = mongoose.model('Chats', ChatSchema);
 module.exports = Chat;

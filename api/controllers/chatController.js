@@ -1,4 +1,3 @@
-
 var mongoose = require('mongoose');
 var Chat = mongoose.model('Chats');
 exports.list_all_chats = function (req, res) {
@@ -75,4 +74,15 @@ exports.delete_a_chat = function (req, res) {
             message: 'Chat has been deleted successfully.'
         });
     })
+}
+exports.list_top_chats = function (req, res) {
+    Chat.find().sort({ post: -1}).limit(3)
+        .exec((err, chats) => {
+            if (err) {
+                console.log(err)
+                res.send("There was an error")
+            } else {
+                res.json(chats)
+            }
+        })
 }

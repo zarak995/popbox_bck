@@ -1,30 +1,38 @@
 var mongoose = require('mongoose');
 var UserSchema = new mongoose.Schema({
     name: {
-        type:String
+        type: String,
+        required: true
     },
     password: {
-        type:String
+        type: String,
+        required: true
     },
     occupation: {
-        type:String
+        type: String
     },
     date_of_birth: {
-        type:Date
+        type: Date,
+        required: true
     },
-    gender:{
-        type:String
+    gender: {
+        type: String,
+        required: true
     },
     email: {
-        type:String
-    },    
+        type: String,
+        unique: true,
+        required: true
+    },
     avatar: [{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Avatars'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Avatars',
+        required: true
     }],
     createdDate: {
-        type: Date, 
-        default: Date.now
+        type: Date,
+        default: Date.now,
+        required: true
     }
 });
 
