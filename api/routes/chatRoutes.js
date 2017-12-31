@@ -15,6 +15,6 @@ module.exports = function (app, data) {
         .put(chat.update_a_chat)
         .delete(chat.delete_a_chat);
 
-    app.route("/chats/top/chats")
+    app.route('/chats/top/chats')
         .get(chat.list_top_chats);
 }

@@ -45,7 +45,7 @@ exports.update_a_chat = function (req, res) {
         $set: {
             body: req.body.body,
             title: req.body.title,
-            likes: req.body.likes
+            likes: req.body.likes,
         }
     })
         .populate({ path: 'owner', model: 'Avatars' })
@@ -65,18 +65,18 @@ exports.update_a_chat = function (req, res) {
         })
 }
 exports.delete_a_chat = function (req, res) {
-    Chat.findByIdAndRemove({
-        _id: req.params.chatId
-    }, function (err, chat) {
-        if (err)
-            res.send(err)
-        res.json({
-            message: 'Chat has been deleted successfully.'
-        });
-    })
+    Chat.findByIdAndRemove({ _id: req.params.chatId })
+        .exec(function (err, chat) {
+            if (err) {
+                res.send(err)
+            }
+            else {                    
+                module.exports.list_all_chats(req, res);
+            }
+        })
 }
 exports.list_top_chats = function (req, res) {
-    Chat.find().sort({ post: -1}).limit(3)
+    Chat.find().sort({ post: -1 }).limit(3)
         .exec((err, chats) => {
             if (err) {
                 console.log(err)
