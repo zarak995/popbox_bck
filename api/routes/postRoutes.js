@@ -9,5 +9,7 @@ module.exports = function(app, data){
     app.route('/posts/:postId')
         .get(post.view_a_post)
         .put(post.update_a_post)
-        .delete(post.delete_a_post);
+
+    app.route('/posts/:chatId/:postId') 
+       .delete(post.delete_a_post);
 }

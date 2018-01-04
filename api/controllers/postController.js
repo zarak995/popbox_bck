@@ -18,7 +18,6 @@ exports.view_a_post = function (req, res) {
 }
 
 exports.create_new_post = function (req, res) {
-    console.log(req.body);
     Chat.findById({ _id: req.body.chat })
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({ path: 'likes', model: 'Avatars' })
@@ -61,14 +60,26 @@ exports.update_a_post = function (req, res) {
         else {
             res.json({ "Suceess": "Post has been updated" });
         }
-
     })
 }
 
 exports.delete_a_post = function (req, res) {
-    Post.findByIdAndRemove({ _id: req.params.postId }, function (err, post) {
-        if (err)
-            res.send(err)
-        res.json({ message: 'Post has been deleted successfully.' });
-    })
+    Chat.findById({ _id: req.params.chatId })
+        .populate({ path: 'owner', model: 'Avatars' })
+        .populate({ path: 'likes', model: 'Avatars' })
+        .exec((err, chat) => {
+            if (err) {
+                console.log(err);
+                res.send("There was an error deleting post");
+            } else {
+                chat.post = chat.post.findByIdAndRemove({ _id: req.params.postId },
+                    function (err, post) {
+                        if (err)
+                            res.send(err)
+                        else {
+                            res.json({ message: 'Post has been deleted successfully.' });
+                        }
+                    })
+            }
+        })
 }

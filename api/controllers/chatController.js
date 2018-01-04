@@ -1,11 +1,16 @@
+var moment = require('moment');
 var mongoose = require('mongoose');
 var Chat = mongoose.model('Chats');
+
 exports.list_all_chats = function (req, res) {
     Chat.find()
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .exec((err, chat) => {
-            if (err) res.send(err);
+            if (err) {
+                console.log(err);
+                res.send("There was a problem listing all chats");
+            }
             else {
                 res.json(chat)
             }
@@ -46,6 +51,7 @@ exports.update_a_chat = function (req, res) {
             body: req.body.body,
             title: req.body.title,
             likes: req.body.likes,
+            reports: req.body.reports
         }
     })
         .populate({ path: 'owner', model: 'Avatars' })
@@ -70,8 +76,8 @@ exports.delete_a_chat = function (req, res) {
             if (err) {
                 res.send(err)
             }
-            else {                    
-                module.exports.list_all_chats(req, res);
+            else {
+                res.json(chat);
             }
         })
 }

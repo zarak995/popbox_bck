@@ -26,6 +26,10 @@ var ChatSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Avatars'
     }],
+    reports: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Avatars'
+    }],
     post: [Post],
     owner: {
         type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +44,6 @@ var ChatSchema = new mongoose.Schema({
     }
 
 });
-ChatSchema.index({body :'text', 'post.body':'text'});
+ChatSchema.index({ body: 'text', 'post.body': 'text' });
 var Chat = mongoose.model('Chats', ChatSchema);
 module.exports = Chat;
