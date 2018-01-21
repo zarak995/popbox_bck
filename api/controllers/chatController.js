@@ -3,15 +3,13 @@ var mongoose = require('mongoose');
 var Chat = mongoose.model('Chats');
 
 exports.list_all_chats = function (req, res) {
-    Chat.find()
+    Chat.find().sort({ _id: -1 })
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .exec((err, chat) => {
-            if (err) {
-                console.log(err);
-                res.send("There was a problem listing all chats");
-            }
+            if (err) res.send(err);
             else {
+                console.log("here")
                 res.json(chat)
             }
         })
