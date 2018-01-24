@@ -8,9 +8,7 @@ exports.list_all_chats = function (req, res) {
         .populate({ path: 'owner', model: 'Avatars' })
         .exec((err, chat) => {
             if (err) res.send(err);
-            else {
-                console.log("here")
-                res.json(chat)
+            else {                res.json(chat)
             }
         })
 }
@@ -80,13 +78,12 @@ exports.delete_a_chat = function (req, res) {
         })
 }
 exports.list_top_chats = function (req, res) {
-    Chat.find().sort({ post: -1 }).limit(3)
-        .exec((err, chats) => {
-            if (err) {
-                console.log(err)
-                res.send("There was an error")
-            } else {
-                res.json(chats)
-            }
-        })
+    Chat.find().sort({ post: -1 }).limit(15)        
+    .populate({ path: 'likes', model: 'Avatars' })
+    .populate({ path: 'owner', model: 'Avatars' })
+    .exec((err, chat) => {
+        if (err) res.send(err);
+        else {                res.json(chat)
+        }
+    })
 }
