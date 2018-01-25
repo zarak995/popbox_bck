@@ -10,7 +10,7 @@ var config = {
         }
     },
     production:{
-        dburl: 'mongodb://njabulothwala23:njabulothwala23@cluster0-shard-00-00-ij80q.mongodb.net:27017,cluster0-shard-00-01-ij80q.mongodb.net:27017,cluster0-shard-00-02-ij80q.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
+        dburl: 'mongodb://zarak995:ZaraKhumba23@cluster0-shard-00-00-wxeue.mongodb.net:27017,cluster0-shard-00-01-wxeue.mongodb.net:27017,cluster0-shard-00-02-wxeue.mongodb.net:27017/suggestionBoxDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
         server: {
             host: 'http://ec2-34-235-230-124.compute-1.amazonaws.com',
             port: '3000'

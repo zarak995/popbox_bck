@@ -8,7 +8,8 @@ exports.list_all_chats = function (req, res) {
         .populate({ path: 'owner', model: 'Avatars' })
         .exec((err, chat) => {
             if (err) res.send(err);
-            else {                res.json(chat)
+            else {                
+                res.json(chat)
             }
         })
 }
