@@ -1,14 +1,15 @@
 var env = process.env.NODE_ENV || 'development';
 var config = require('../../env/config')[env];
+var avatar = require('./avatarController');
 var mongoose = require('mongoose'),
     User = mongoose.model('Users'),
+    Sender = require('aws-sms-send'),
     jwt = require('jsonwebtoken'),
     passport = require('passport'),
     passportJWT = require('passport-jwt'),
     extractJWT = passportJWT.ExtractJwt,
     jwtStrategy = passportJWT.Strategy,
     User = require('../../api/models/user'),
-
     jwtOptions = {
         jwtFromRequest: extractJWT.fromHeader('authorization'),
         secretOrKey: config.secret
@@ -16,7 +17,6 @@ var mongoose = require('mongoose'),
 
 var strategy = new jwtStrategy(jwtOptions, function (jwt_payload, next) {
     console.log('Payload received', jwt_payload);
-
     var user = users[_.findIndex(users, {
         id: jwt_payload.id
     })];
@@ -76,7 +76,34 @@ function compareToUserPassword(userPassword, bodyPassword) {
         return false;
     }
 }
-var avatar = require('./avatarController');
+
+function send_sms(phoneNumber) {
+    var Tempuser = mongoose.model('TempUser');
+    var sms_config = {
+        AWS: {
+            accessKeyId: config.aws_accessKeyId,
+            secretAccessKey: config.aws_secretAccessKey,
+            region: config.aws_region
+        }
+    };
+    var sender = new Sender(sms_config);
+    sender.sendSms(config.aws_verification_code_message_body,
+        config.aws_topic_sms, false, '+27798784626')
+        .then(function (response) {
+            var new_temp_user = new Tempuser({
+                messageId: response.MessageId,
+                username: 'justAusername', verificationCode: '23213'
+            });
+            new_temp_user.save(function (err, Tempuser) {
+                if (err) res.send(err);
+            })
+
+        })
+        .catch(function (err) {
+            console.log(err)
+        });
+}
+
 exports.create_a_user = function (req, res) {
     var new_user = new User(req.body);
     console.log(req.body);
@@ -85,6 +112,7 @@ exports.create_a_user = function (req, res) {
         else {
             req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
             req.body.user = user._id;
+            send_sms('sfsdfsdfs');
             avatar.create_an_avatar(req, res);
         }
     })
