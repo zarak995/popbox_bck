@@ -3,6 +3,7 @@ var config = require('../../env/config')[env];
 var avatar = require('./avatarController');
 var mongoose = require('mongoose'),
     User = mongoose.model('Users'),
+    TempUser = mongoose.model('TempUser'),
     Sender = require('aws-sms-send'),
     jwt = require('jsonwebtoken'),
     passport = require('passport'),
@@ -77,7 +78,7 @@ function compareToUserPassword(userPassword, bodyPassword) {
     }
 }
 
-function send_sms(phoneNumber) {
+function send_sms(phoneNumber, verificationCode) {
     var Tempuser = mongoose.model('TempUser');
     var sms_config = {
         AWS: {
@@ -87,17 +88,10 @@ function send_sms(phoneNumber) {
         }
     };
     var sender = new Sender(sms_config);
-    sender.sendSms(config.aws_verification_code_message_body,
-        config.aws_topic_sms, false, '+27798784626')
+    sender.sendSms(config.aws_verification_code_message_body + verificationCode,
+        config.aws_topic_sms, false, phoneNumber)
         .then(function (response) {
-            var new_temp_user = new Tempuser({
-                messageId: response.MessageId,
-                username: 'justAusername', verificationCode: '23213'
-            });
-            new_temp_user.save(function (err, Tempuser) {
-                if (err) res.send(err);
-            })
-
+            console.log(response)
         })
         .catch(function (err) {
             console.log(err)
@@ -112,8 +106,14 @@ exports.create_a_user = function (req, res) {
         else {
             req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
             req.body.user = user._id;
-            send_sms('sfsdfsdfs');
             avatar.create_an_avatar(req, res);
+            var new_temp_user = new TempUser({
+                userId: new_user._id, verificationCode: Math.floor(Math.random() * 31245)
+            });
+            new_temp_user.save(function (err, Tempuser) {
+                if (err) res.send(err);
+            })
+            send_sms(new_user.phone, new_temp_user.verificationCode);
         }
     })
 }
