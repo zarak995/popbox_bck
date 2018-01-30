@@ -10,7 +10,7 @@ var config = {
         },
         
         aws_topic_sms: 'Topic sms',
-        aws_verification_code_message_body: 'Thank you for registering with oOxet.com this is your Verification code 56789867',
+        aws_verification_code_message_body: 'Thank you for registering with oOxet.com. This is your Verification code ',
         aws_accessKeyId: 'AKIAIOIGEBKPZGPS7TGQ',
         aws_secretAccessKey: 'kRLApWaOh6loKHcUdtxvTrmA6drpw6IBxa2XOtsJ',
         aws_region: 'us-east-1',
@@ -22,7 +22,7 @@ var config = {
             port: '3000'
         },
         aws_topic_sms: 'Topic sms',
-        aws_verification_code_message_body: 'Thank you for registering with oOxet.com this is your Verification code 56789867',
+        aws_verification_code_message_body: 'Thank you for registering with oOxet.com. This is your Verification code',
         aws_accessKeyId: 'AKIAIOIGEBKPZGPS7TGQ',
         aws_secretAccessKey: 'kRLApWaOh6loKHcUdtxvTrmA6drpw6IBxa2XOtsJ',
         aws_region: 'us-east-1',
