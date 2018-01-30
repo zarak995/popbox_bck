@@ -2,12 +2,13 @@ require('../api/models/user');
 require('../api/models/avatar');
 require('../api/models/chat');
 require('../api/models/post');
-
+require('../api/models/tempuser');
 var mongoose = require('mongoose');
 console.log(mongoose.connection.readyState);
 var env = process.env.NODE_ENV || 'development';
 var config = require('../env/config')[env];
 var express = require('express'),
+
     port = process.env.PORT || 3000,
     jwt = require('jsonwebtoken'),
     bodyParser = require('body-parser'),
