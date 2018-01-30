@@ -24,6 +24,11 @@ var UserSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
+    phone: {
+        type: String,
+        unique: true,
+        required: true
+    },
     avatar: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Avatars',
