@@ -1,14 +1,10 @@
 var mongoose = require('mongoose');
 tempuserSchema = new mongoose.Schema({
-    username: {
+    userId: {
         type: String,
         required: true
     },
     verificationCode: {
-        type: String,
-        required: true
-    },
-    messageId: {
         type: String,
         required: true
     },
