@@ -18,7 +18,7 @@ var config = {
     production: {
         dburl: 'mongodb://zarak995:ZaraKhumba23@cluster0-shard-00-00-wxeue.mongodb.net:27017,cluster0-shard-00-01-wxeue.mongodb.net:27017,cluster0-shard-00-02-wxeue.mongodb.net:27017/suggestionBoxDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin',
         server: {
-            host: 'http://ec2-34-235-230-124.compute-1.amazonaws.com',
+            host: 'http://http://52.55.249.148',
             port: '3000'
         },
         aws_topic_sms: 'Topic sms',
