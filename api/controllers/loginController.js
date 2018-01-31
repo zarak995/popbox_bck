@@ -30,7 +30,10 @@ var strategy = new jwtStrategy(jwtOptions, function (jwt_payload, next) {
 });
 exports.authenticate = function (req, res) {
     User.findOne({
-        email: req.body.username
+        $or: [
+            { email: req.body.username },
+            { phone: req.body.username }
+        ]
     },
         function (err, user) {
             if (err) {
@@ -78,7 +81,7 @@ function compareToUserPassword(userPassword, bodyPassword) {
     }
 }
 
-function send_sms(phoneNumber, verificationCode) {
+function send_sms() {
     var Tempuser = mongoose.model('TempUser');
     var sms_config = {
         AWS: {
@@ -88,8 +91,8 @@ function send_sms(phoneNumber, verificationCode) {
         }
     };
     var sender = new Sender(sms_config);
-    sender.sendSms(config.aws_verification_code_message_body + verificationCode,
-        config.aws_topic_sms, false, phoneNumber)
+    sender.sendSms(config.aws_verification_code_message_body,
+        config.aws_topic_sms, false, '+27798784626')
         .then(function (response) {
             console.log(response)
         })
@@ -102,7 +105,7 @@ exports.create_a_user = function (req, res) {
     var new_user = new User(req.body);
     console.log(req.body);
     new_user.save(function (err, user) {
-        if (err) res.send(err)
+        if (err) res.json({ code: "11000", message: "Please use a different email address or phone number" })
         else {
             req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
             req.body.user = user._id;
@@ -113,7 +116,26 @@ exports.create_a_user = function (req, res) {
             new_temp_user.save(function (err, Tempuser) {
                 if (err) res.send(err);
             })
-            send_sms(new_user.phone, new_temp_user.verificationCode);
+
+            var Tempuser = mongoose.model('TempUser');
+            var Sender = require('aws-sms-send');
+            var sms_config = {
+                AWS: {
+                    accessKeyId: 'AKIAIOIGEBKPZGPS7TGQ',
+                    secretAccessKey: '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',
+                    region: 'us-east-1',
+                }
+            };
+
+            console.log(new_user.phone + "  " + new_temp_user.verificationCode);
+            var sender = new Sender(sms_config);
+            sender.sendSms('Thank you for registering with oOxet.com this is your Verification code 56789867', 'Topic sms', false, '+27798784626')
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (err) {
+                    console.log(err)
+                });
         }
     })
 }
