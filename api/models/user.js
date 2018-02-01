@@ -34,6 +34,11 @@ var UserSchema = new mongoose.Schema({
         ref: 'Avatars',
         required: true
     }],
+    active: {
+        type: Boolean,
+        required:true,
+        default: false
+    },
     createdDate: {
         type: Date,
         default: Date.now,
