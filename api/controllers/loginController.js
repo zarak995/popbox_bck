@@ -81,24 +81,45 @@ function compareToUserPassword(userPassword, bodyPassword) {
     }
 }
 
-function send_sms() {
-    var Tempuser = mongoose.model('TempUser');
-    var sms_config = {
-        AWS: {
-            accessKeyId: config.aws_accessKeyId,
-            secretAccessKey: config.aws_secretAccessKey,
-            region: config.aws_region
-        }
-    };
-    var sender = new Sender(sms_config);
-    sender.sendSms(config.aws_verification_code_message_body,
-        config.aws_topic_sms, false, '+27798784626')
-        .then(function (response) {
-            console.log(response)
-        })
-        .catch(function (err) {
-            console.log(err)
+exports.verify_a_user = function (req, res) {
+    console.log("here");
+    console.log(req.body);
+    TempUser.findOne({
+        userId: req.body.userId
+    },
+        function (err, tempuser) {
+            if (err) res.json({ message: "There was a problem please try again later" })
+            else {
+                console.log(tempuser)
+                User.findByIdAndUpdate(tempuser.userId, {
+                    $set: {
+                        active: true
+                    }
+                },
+                    (err, user) => {
+                        if (err) {
+                            console.log(err);
+                            res.json({ message: "There was a problem, please try again later" });
+                        } else {
+                            TempUser.findByIdAndRemove(tempuser._id,
+                                (err) => {
+                                    if (err) {
+                                        console.log(err);
+                                        res.json({ message: "There was an error please try again later" })
+                                    } else {
+                                        console.log('user has been activated')
+                                    }
+                                })
+                            res.json({ message: "Account has been verified" })
+                        }
+                    }
+                )
+            }
         });
+    //update stattus on permanent db table
+
+    //remove the temp_user record on temp table
+
 }
 
 exports.create_a_user = function (req, res) {
@@ -114,28 +135,34 @@ exports.create_a_user = function (req, res) {
                 userId: new_user._id, verificationCode: Math.floor(Math.random() * 31245)
             });
             new_temp_user.save(function (err, Tempuser) {
-                if (err) res.send(err);
-            })
-
-            var Tempuser = mongoose.model('TempUser');
-            var Sender = require('aws-sms-send');
-            var sms_config = {
-                AWS: {
-                    accessKeyId: 'AKIAIOIGEBKPZGPS7TGQ',
-                    secretAccessKey: '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',
-                    region: 'us-east-1',
-                }
-            };
-
-            console.log(new_user.phone + "  " + new_temp_user.verificationCode);
-            var sender = new Sender(sms_config);
-            sender.sendSms('Thank you for registering with oOxet.com this is your Verification code 56789867', 'Topic sms', false, '+27798784626')
-                .then(function (response) {
-                    console.log(response);
-                })
-                .catch(function (err) {
+                if (err) {
                     console.log(err)
-                });
+                    res.send("There was an error please try again later");
+                }
+                else {
+                    sendVerificationSMS(new_user.phone, new_temp_user.verificationCode);
+                }
+            })
         }
     })
+}
+
+function sendVerificationSMS(phoneNumber, verificationCode) {
+    var Tempuser = mongoose.model('TempUser');
+    var Sender = require('aws-sms-send');
+    var sms_config = {
+        AWS: {
+            accessKeyId: config.aws_accessKeyId,
+            secretAccessKey: config.aws_secretAccessKey,
+            region: config.aws_region
+        }
+    };
+    var sender = new Sender(sms_config);
+    sender.sendSms(config.aws_verification_code_message_body + verificationCode, config.aws_topic_sms, false, phoneNumber)
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (err) {
+            console.log(err)
+        })
 }
