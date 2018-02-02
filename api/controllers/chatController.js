@@ -6,9 +6,10 @@ exports.list_all_chats = function (req, res) {
     Chat.find().sort({ _id: -1 })
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
+        .populate({ path: 'reports', model: 'Avatars' })
         .exec((err, chat) => {
             if (err) res.send(err);
-            else {                
+            else {
                 res.json(chat)
             }
         })
@@ -17,6 +18,7 @@ exports.view_a_chat = function (req, res) {
     Chat.findById({ _id: req.params.chatId })
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
+        .populate({ path: 'reports', model: 'Avatars' })
         .populate({
             path: 'post', model: 'Posts',
             populate: {
@@ -27,6 +29,7 @@ exports.view_a_chat = function (req, res) {
         .exec((err, chat) => {
             if (err) res.send(err);
             else {
+                console.log(chat)
                 res.json(chat)
             }
         })
@@ -42,6 +45,7 @@ exports.create_a_chat = function (req, res) {
         }
     })
 }
+
 exports.update_a_chat = function (req, res) {
     Chat.findByIdAndUpdate(req.params.chatId, {
         $set: {
@@ -78,13 +82,15 @@ exports.delete_a_chat = function (req, res) {
             }
         })
 }
+
 exports.list_top_chats = function (req, res) {
-    Chat.find().sort({ post: -1 }).limit(15)        
-    .populate({ path: 'likes', model: 'Avatars' })
-    .populate({ path: 'owner', model: 'Avatars' })
-    .exec((err, chat) => {
-        if (err) res.send(err);
-        else {                res.json(chat)
-        }
-    })
+    Chat.find().sort({ post: -1 }).limit(15)
+        .populate({ path: 'likes', model: 'Avatars' })
+        .populate({ path: 'owner', model: 'Avatars' })
+        .exec((err, chat) => {
+            if (err) res.send(err);
+            else {
+                res.json(chat)
+            }
+        })
 }
