@@ -27,7 +27,8 @@ var UserSchema = new mongoose.Schema({
     phone: {
         type: String,
         unique: true,
-        required: true
+        required: true,
+        index: true
     },
     avatar: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -36,7 +37,7 @@ var UserSchema = new mongoose.Schema({
     }],
     active: {
         type: Boolean,
-        required:true,
+        required: true,
         default: false
     },
     createdDate: {
