@@ -44,6 +44,13 @@ exports.authenticate = function (req, res) {
                 });
             } else if (user !== null) {
                 console.log('Console Log');
+                /***
+                  if (user.active === false) {
+                      console.log("inactive user")
+                      res.json({ code: '401', message: "user has not been verfied yet", uid: user._id });
+                      return;
+                  }
+                   */
                 if (req.body.password) {
                     var isValid = compareToUserPassword(user.password, req.body.password);
                     if (!isValid) {
@@ -81,6 +88,7 @@ function compareToUserPassword(userPassword, bodyPassword) {
     }
 }
 
+//For future implementation
 exports.verify_a_user = function (req, res) {
     console.log("here");
     console.log(req.body);
@@ -89,7 +97,7 @@ exports.verify_a_user = function (req, res) {
     },
         function (err, tempuser) {
             if (err) res.json({ message: "There was a problem please try again later" })
-            else {
+            else if (tempuser.userId !== '') {
                 console.log(tempuser)
                 User.findByIdAndUpdate(tempuser.userId, {
                     $set: {
@@ -114,6 +122,9 @@ exports.verify_a_user = function (req, res) {
                         }
                     }
                 )
+            } else {
+                console.log(tempuser.userId)
+                res.send('There was a problem')
             }
         });
     //update stattus on permanent db table
@@ -131,7 +142,7 @@ exports.create_a_user = function (req, res) {
             req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
             req.body.user = user._id;
             avatar.create_an_avatar(req, res);
-            var new_temp_user = new TempUser({
+            /*var new_temp_user = new TempUser({
                 userId: new_user._id, verificationCode: Math.floor(Math.random() * 31245)
             });
             new_temp_user.save(function (err, Tempuser) {
@@ -140,13 +151,15 @@ exports.create_a_user = function (req, res) {
                     res.send("There was an error please try again later");
                 }
                 else {
+                    console.log('user saved');
                     sendVerificationSMS(new_user.phone, new_temp_user.verificationCode);
                 }
-            })
+            })*/
         }
     })
 }
 
+//for future implementation
 function sendVerificationSMS(phoneNumber, verificationCode) {
     var Tempuser = mongoose.model('TempUser');
     var Sender = require('aws-sms-send');
