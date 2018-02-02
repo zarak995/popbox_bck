@@ -7,6 +7,7 @@ module.exports = function (app) {
     app.route('/login/reg')
         .post(login.create_a_user);
 
-    app.route('/login/ver')
-        .post(login.verify_a_user);
+    //for future implementation
+   /* app.route('/login/ver')
+        .post(login.verify_a_user);*/
 }
