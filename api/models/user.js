@@ -6,18 +6,20 @@ var UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        min:6
     },
     occupation: {
         type: String
     },
-    date_of_birth: {
+    dateOfBirth: {
         type: Date,
         required: true
     },
     gender: {
         type: String,
-        required: true
+        required: true,
+        max:1
     },
     email: {
         type: String,

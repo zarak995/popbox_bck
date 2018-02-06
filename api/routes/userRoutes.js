@@ -8,5 +8,7 @@ module.exports = function (app, data) {
         .get(user.view_a_user)
         .put(user.update_a_user)
         .delete(user.delete_a_user);
-
+    
+        app.route('/users/change_pass/:userId')
+        .put(user.change_user_password)
 }
