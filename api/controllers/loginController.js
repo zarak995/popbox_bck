@@ -83,9 +83,8 @@ function compareToUserPassword(userPassword, bodyPassword) {
     //write password hashing algorithm..... 
     if (bodyPassword === userPassword) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 //For future implementation
