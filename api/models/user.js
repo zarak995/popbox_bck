@@ -7,7 +7,7 @@ var UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        min:6
+        minlength: 6
     },
     occupation: {
         type: String
@@ -19,7 +19,7 @@ var UserSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
-        max:1
+        max: 1
     },
     email: {
         type: String,
@@ -38,6 +38,11 @@ var UserSchema = new mongoose.Schema({
         required: true
     }],
     active: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    isShowReported: {
         type: Boolean,
         required: true,
         default: false
