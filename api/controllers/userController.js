@@ -37,7 +37,8 @@ exports.update_a_user = function (req, res) {
     User.findByIdAndUpdate(req.params.userId, {
         $set: {
             phone: req.body.phone,
-            email: req.body.email
+            email: req.body.email,
+            occupation: req.body.occupation
         }
     })
         .exec((err, user) => {
