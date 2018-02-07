@@ -38,7 +38,8 @@ exports.update_a_user = function (req, res) {
         $set: {
             phone: req.body.phone,
             email: req.body.email,
-            occupation: req.body.occupation
+            occupation: req.body.occupation,
+            isShowReported: req.bodt.isShowReported
         }
     })
         .exec((err, user) => {
