@@ -39,7 +39,7 @@ exports.update_a_user = function (req, res) {
             phone: req.body.phone,
             email: req.body.email,
             occupation: req.body.occupation,
-            isShowReported: req.bodt.isShowReported
+            isShowReported: req.body.isShowReported
         }
     })
         .exec((err, user) => {
