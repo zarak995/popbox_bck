@@ -92,7 +92,7 @@ exports.delete_a_chat = function (req, res) {
         })
 }
 exports.user_chats = function (req, res) {
-    Chat.find({})
+    Chat.find({}).sort({ _id: -1 })
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({ path: 'reports', model: 'Avatars' })
