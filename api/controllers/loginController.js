@@ -2,7 +2,8 @@ var env = process.env.NODE_ENV || 'development';
 var config = require('../../env/config')[env];
 var avatar = require('./avatarController');
 var mongoose = require('mongoose'),
-    User = mongoose.model('Users'),
+    sendEmail = require('../controllers/sendEmail');
+User = mongoose.model('Users'),
     TempUser = mongoose.model('TempUser'),
     Sender = require('aws-sms-send'),
     jwt = require('jsonwebtoken'),
@@ -44,13 +45,25 @@ exports.authenticate = function (req, res) {
                 });
             } else if (user !== null) {
                 console.log('Console Log');
-                /***
-                  if (user.active === false) {
-                      console.log("inactive user")
-                      res.json({ code: '401', message: "user has not been verfied yet", uid: user._id });
-                      return;
-                  }
-                   */
+
+                if (user.active === false) {
+                    console.log("inactive user")
+                    TempUser.findOne({ userId: user._id },
+                        (err, tempuser) => {
+                            if (err) {
+                                console.log(err);
+                                res.send("There was a problem please try again later")
+                            } else {
+                                res.json({
+                                    code: '401',
+                                    message: "user has not been verfied yet", uid: tempuser._id
+                                });
+                                console.log("Tempuser ID sent");
+                            }
+                        })
+                    return;
+                }
+
                 if (req.body.password) {
                     var isValid = compareToUserPassword(user.password, req.body.password);
                     if (!isValid) {
@@ -91,9 +104,7 @@ function compareToUserPassword(userPassword, bodyPassword) {
 exports.verify_a_user = function (req, res) {
     console.log("here");
     console.log(req.body);
-    TempUser.findOne({
-        userId: req.body.userId
-    },
+    TempUser.findById(req.body.userId,
         function (err, tempuser) {
             if (err) res.json({ message: "There was a problem please try again later" })
             else if (tempuser.userId !== '') {
@@ -117,7 +128,7 @@ exports.verify_a_user = function (req, res) {
                                         console.log('user has been activated')
                                     }
                                 })
-                            res.json({ message: "Account has been verified" })
+                            res.send("Account has been activated");
                         }
                     }
                 )
@@ -140,20 +151,22 @@ exports.create_a_user = function (req, res) {
         else {
             req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
             req.body.user = user._id;
-            avatar.create_an_avatar(req, res);
-            /*var new_temp_user = new TempUser({
+            createDefaultAvatar(req.body);
+            var new_temp_user = new TempUser({
                 userId: new_user._id, verificationCode: Math.floor(Math.random() * 31245)
             });
-            new_temp_user.save(function (err, Tempuser) {
+            new_temp_user.save(function (err, tempuser) {
                 if (err) {
                     console.log(err)
                     res.send("There was an error please try again later");
                 }
                 else {
                     console.log('user saved');
-                    sendVerificationSMS(new_user.phone, new_temp_user.verificationCode);
+                    sendVerificationEMAIL(new_user.email, new_user.name, new_temp_user.verificationCode);
+                    console.log("Temp user ID = " + tempuser._id);
+                    res.json(tempuser._id);
                 }
-            })*/
+            })
         }
     })
 }
@@ -177,4 +190,34 @@ function sendVerificationSMS(phoneNumber, verificationCode) {
         .catch(function (err) {
             console.log(err)
         })
+}
+
+function sendVerificationEMAIL(email, name, verificationCode) {
+    var ses = require('node-ses')
+        , client = ses.createClient({ key: 'AKIAJPFFPZFHBRTUGSPA', secret: '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' });
+    // Give SES the details and let it construct the message for you.
+    client.sendEmail({
+        to: email
+        , from: 'hi.ooxet@outlook.com'
+        , subject: 'Verification Code'
+        , message: '<strong>Hi ' + name + ' </strong> <br> Thank you for registering with <strong>oOxet.com</strong><br>'
+            + 'This is your verification code '
+            + "<div style=' color: blue; width:100%; font-size:150%; border:solid grey 1px;'>" + verificationCode + "</div>"
+        , altText: 'plain text'
+    }, function (err, data, res) {
+        if (err) { console.log(err) }
+        else { console.log(data); }
+    });
+}
+
+function createDefaultAvatar(body) {
+    var new_avatar = new Avatar(body);
+    new_avatar.save(function (err, avatar) {
+        if (err)
+            res.send(err)
+        else {
+            console.log("Avatar has been created")
+            //res.json(avatar);
+        }
+    });
 }
