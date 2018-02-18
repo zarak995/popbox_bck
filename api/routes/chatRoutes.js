@@ -1,7 +1,12 @@
 'use scrict'
 module.exports = function (app, data) {
     var mongoose = require('mongoose');
-    console.log(mongoose.connection.readyState);
+    console.log()
+    console.log('CHATS');
+    console.log('All Chats  /chats');
+    console.log('Top Chats /chats/top/chats');
+    console.log('User Chats /chat/users/:user/Id');
+    console.log('View Chat /chats/:chatID');
 
     var chat = require('../controllers/chatController'),
         login = require('../controllers/loginController');

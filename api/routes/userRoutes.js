@@ -1,6 +1,14 @@
 'use strict';
 module.exports = function (app, data) {
     var user = require('../controllers/userController');
+    console.log();
+    console.log("All Users GET /users")
+    console.log("View user GET /users/:userId")
+    console.log("Update User PUT /users/:userId")
+    console.log("Delete User DELETE /users/:userId")
+    console.log("Change username PUT /users/:userId")
+    
+    
     app.route('/users')
         .get(user.list_all_users)
 

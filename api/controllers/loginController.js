@@ -40,14 +40,10 @@ exports.authenticate = function (req, res) {
             if (err) {
                 res.send(err)
             } else if (user === null) {
-                res.send({
-                    message: 'The username provided is not registered on our system'
-                });
+                console.log("User is not registered");
+                res.json({message:'The username or password is not valid'});
             } else if (user !== null) {
-                console.log('Console Log');
-
                 if (user.active === false) {
-                    console.log("inactive user")
                     TempUser.findOne({ userId: user._id },
                         (err, tempuser) => {
                             if (err) {
@@ -56,7 +52,8 @@ exports.authenticate = function (req, res) {
                             } else {
                                 res.json({
                                     code: '401',
-                                    message: "user has not been verfied yet", uid: tempuser._id
+                                    message: "user has not been verfied yet", 
+                                    uid: tempuser._id
                                 });
                                 console.log("Tempuser ID sent");
                             }
@@ -104,9 +101,17 @@ function compareToUserPassword(userPassword, bodyPassword) {
 exports.verify_a_user = function (req, res) {
     console.log("here");
     console.log(req.body);
-    TempUser.findById(req.body.userId,
+    TempUser.findOne({
+        $and: [
+            { _id: req.body.userId },
+            { verificationCode: req.body.code }
+        ]
+    },
         function (err, tempuser) {
             if (err) res.json({ message: "There was a problem please try again later" })
+            else if (tempuser == null) {
+                res.send("Validation code entered is incorrect. Please resend code");
+            }
             else if (tempuser.userId !== '') {
                 console.log(tempuser)
                 User.findByIdAndUpdate(tempuser.userId, {
@@ -132,9 +137,6 @@ exports.verify_a_user = function (req, res) {
                         }
                     }
                 )
-            } else {
-                console.log(tempuser.userId)
-                res.send('There was a problem')
             }
         });
     //update stattus on permanent db table

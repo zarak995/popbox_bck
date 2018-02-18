@@ -1,9 +1,10 @@
+var ses = require('node-ses');
 var mongoose = require('mongoose'),
     TempUser = mongoose.model('TempUser'),
     User = mongoose.model('Users');
-
 exports.send_email = function (req, res) {
     console.log("Email Sent");
+    console.log(req.body);
     TempUser.findById(req.body.userId, (err, tempuser) => {
         if (err) {
             console.log(err);
@@ -11,8 +12,7 @@ exports.send_email = function (req, res) {
         } else {
             console.log(tempuser);
             User.findById(tempuser.userId, (err, user) => {
-                var ses = require('node-ses')
-                    , client = ses.createClient({ key: 'AKIAJPFFPZFHBRTUGSPA', secret: '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' });
+                var client = ses.createClient({ key: 'AKIAJPFFPZFHBRTUGSPA', secret: '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' });
                 client.sendEmail({
                     to: user.email
                     , from: 'hi.ooxet@outlook.com'

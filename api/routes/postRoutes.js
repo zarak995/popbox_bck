@@ -1,7 +1,14 @@
 'use strict'
 module.exports = function(app, data){
     var post = require('../controllers/postController');
-
+    console.log();
+    console.log("All Posts GET /posts")
+    console.log("New Post POST /posts")
+    console.log("View Post GET /posts/:postId")
+    console.log("Update Post PUT /posts/:postId")
+    console.log("Delete Post DELETE /posts/:postId")
+    
+    
     app.route('/posts')
         .get(post.list_all_posts)
         .post(post.create_new_post);
