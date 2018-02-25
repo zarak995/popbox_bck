@@ -48,22 +48,6 @@ exports.create_new_post = function (req, res) {
 }
 
 exports.update_a_post = function (req, res) {
-    Post.findByIdAndUpdate(req.params.postId, {
-        $set: {
-            body: req.body.body
-        }
-    }, (err, post) => {
-        if (err) {
-            console.log(err);
-            res.send("There was an error");
-        }
-        else {
-            res.json({ "Suceess": "Post has been updated" });
-        }
-    })
-}
-
-exports.delete_a_post = function (req, res) {
     Chat.findById({ _id: req.params.chatId })
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({ path: 'likes', model: 'Avatars' })
@@ -72,14 +56,54 @@ exports.delete_a_post = function (req, res) {
                 console.log(err);
                 res.send("There was an error deleting post");
             } else {
-                chat.post = chat.post.findByIdAndRemove({ _id: req.params.postId },
-                    function (err, post) {
-                        if (err)
-                            res.send(err)
-                        else {
-                            res.json({ message: 'Post has been deleted successfully.' });
-                        }
-                    })
+                let maxPosts = chat.post.length;
+                for (var x = 0; x < maxPosts; x++) {
+                    if (chat.post[x]._id == req.params.postId) {
+                        chat.post[x].reports = req.body.reports;
+                        chat.post[x].body = req.body.body;
+                        chat.save(function (err, chat) {
+                            if (err) { console.log(err) }
+                            else {
+                                res.json(chat);
+                                return;
+                            }
+                        })
+                        break;
+                    }
+                }
             }
+            return;
         })
+    return;
+}
+
+
+exports.delete_a_post = function (req, res) {
+    console.log(req.params);
+    Chat.findById({ _id: req.params.chatId })
+        .populate({ path: 'owner', model: 'Avatars' })
+        .populate({ path: 'likes', model: 'Avatars' })
+        .exec((err, chat) => {
+            if (err) {
+                console.log(err);
+                res.send("There was an error deleting post");
+            } else {
+                let maxPosts = chat.post.length;
+                for (var x = 0; x < maxPosts; x++) {
+                    if (chat.post[x]._id == req.params.postId) {
+                        chat.post.splice(x, 1);
+                        chat.save(function (err, chat) {
+                            if (err) { console.log(err) }
+                            else {
+                                res.json(chat);
+                                return;
+                            }
+                        })
+                        break;
+                    }
+                }
+            }
+            return;
+        })
+    return;
 }
