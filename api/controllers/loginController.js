@@ -38,54 +38,80 @@ exports.authenticate = function (req, res) {
     },
         function (err, user) {
             if (err) {
-                res.send(err)
+                console.log('There was an error /login')
+                console.log(err)
+                res.json({
+                    status: "error",
+                    message: 'system error occured please try again later'
+                })
             } else if (user === null) {
                 console.log("User is not registered");
-                res.json({message:'The username or password is not valid'});
+                res.json({
+                    status: 'failed',
+                    message: 'username and/or password  is not valid'
+                });
             } else if (user !== null) {
                 if (user.active === false) {
                     TempUser.findOne({ userId: user._id },
                         (err, tempuser) => {
                             if (err) {
+                                console.log('There was an error on /login')
                                 console.log(err);
-                                res.send("There was a problem please try again later")
-                            } else {
                                 res.json({
-                                    code: '401',
-                                    message: "user has not been verfied yet", 
-                                    uid: tempuser._id
-                                });
-                                console.log("Tempuser ID sent");
+                                    status: "error",
+                                    message: 'system error occured please try again later'
+                                })
+                            } else {
+                                if (tempuser === null) {
+                                    console.log('Tempuser is not found');
+                                    res.json({
+                                        status: "failed",
+                                        message: 'please cancel and try to login again'
+                                    })
+                                }
+                                else {
+                                    res.json({
+                                        status: 'verifywithcode',
+                                        message: "user has not been verfied yet",
+                                        userId: tempuser._id
+                                    });
+                                }
                             }
                         })
                     return;
                 }
 
                 if (req.body.password) {
-                    var isValid = compareToUserPassword(user.password, req.body.password);
-                    if (!isValid) {
-                        res.json({
-                            message: 'Please provide valid credentials'
-                        });
-                    } else if (isValid) {
-                        var payload = {
-                            id: user.id
+                    try {
+                        var isValid = compareToUserPassword(user.password, req.body.password);
+                        if (!isValid) {
+                            res.json({
+                                status: 'failed',
+                                message: 'username and/or password  is not valid'
+                            });
+                        } else if (isValid) {
+                            var payload = {
+                                id: user.id
+                            }
+                            var token = jwt.sign(payload, jwtOptions.secretOrKey);
+                            res.json({
+                                status:'success',
+                                message: 'user has been logged on',
+                                token: token,
+                                user: user.id
+                            });
                         }
-                        var token = jwt.sign(payload, jwtOptions.secretOrKey);
-                        console.log(token);
-                        res.json({
-                            message: 'Ok',
-                            token: token,
-                            user: user.id
-                        });
-                    } else {
-                        res.status(401).json({
-                            message: ' Passwords did not match',
-                        });
+                    } catch (error) {
+                        console.log('Error occurred at /login');
+                        console.log(error);
+                        res.status('error')
+                            .json({
+                                message: 'system error occured please try again later'
+                            })
                     }
+
                 }
             }
-
         });
 }
 
@@ -108,12 +134,21 @@ exports.verify_a_user = function (req, res) {
         ]
     },
         function (err, tempuser) {
-            if (err) res.json({ message: "There was a problem please try again later" })
+            if (err) {
+                console.log("Error on /login/ver")
+                console.log(err)
+                res.json({
+                    status: 'error',
+                    message: 'system error occured please try again later'
+                });
+            }
             else if (tempuser == null) {
-                res.send("Validation code entered is incorrect. Please resend code");
+                res.json({
+                    status: "failed",
+                    message: "Please enter a valid verification code"
+                });
             }
             else if (tempuser.userId !== '') {
-                console.log(tempuser)
                 User.findByIdAndUpdate(tempuser.userId, {
                     $set: {
                         active: true
@@ -122,18 +157,31 @@ exports.verify_a_user = function (req, res) {
                     (err, user) => {
                         if (err) {
                             console.log(err);
-                            res.json({ message: "There was a problem, please try again later" });
+                            res.json({
+                                status: "error",
+                                message: 'system error occured please try again later'
+                            });
                         } else {
-                            TempUser.findByIdAndRemove(tempuser._id,
-                                (err) => {
-                                    if (err) {
-                                        console.log(err);
-                                        res.json({ message: "There was an error please try again later" })
-                                    } else {
-                                        console.log('user has been activated')
-                                    }
-                                })
-                            res.send("Account has been activated");
+                            if (user == null) {
+                                res.json({ status: 'failed', message: 'There was an error, Please validate again' })
+                            } else {
+                                TempUser.findByIdAndRemove(tempuser._id,
+                                    (err) => {
+                                        if (err) {
+                                            console.log(err);
+                                            res.json({
+                                                status: "error",
+                                                message: 'system error occured please try again later'
+                                            })
+                                        } else {
+                                            console.log('Request Complete at ')
+                                            res.json({
+                                                status: 'success',
+                                                message: 'Your account has been activated'
+                                            })
+                                        }
+                                    })
+                            }
                         }
                     }
                 )
@@ -155,7 +203,8 @@ exports.create_a_user = function (req, res) {
             req.body.user = user._id;
             createDefaultAvatar(req.body);
             var new_temp_user = new TempUser({
-                userId: new_user._id, verificationCode: Math.floor(Math.random() * 31245)
+                userId: new_user._id,
+                verificationCode: Math.floor(Math.random() * 31245)
             });
             new_temp_user.save(function (err, tempuser) {
                 if (err) {
