@@ -34,32 +34,39 @@ exports.new_user = function (req, res) {
                                         message: "Please use a different email address or phone number"
                                     })
                                 } else {
-                                    req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
-                                    req.body.user = user._id;
-                                    createDefaultAvatar(req.body);
-                                    var new_temp_user = new TempUser({
-                                        userId: new_user._id,
-                                        verificationCode: Math.floor(Math.random() * 31245)
-                                    });
-                                    new_temp_user.save(function (err, tempuser) {
-                                        if (err) {
-                                            console.log(err)
-                                            res.json({
-                                                status: "error",
-                                                message: 'system error occured please try again later'
-                                            })
-                                        }
-                                        else {
-                                            console.log('user saved');
-                                            sendVerificationEMAIL(new_user.email, new_user.name, new_temp_user.verificationCode);
-                                            console.log("Temp user ID = " + tempuser._id);
-                                            res.json({
-                                                status: 'success',
-                                                message: 'your account has been created',
-                                                userId: tempuser._id
-                                            });
-                                        }
-                                    })
+                                    if (user == null) {
+                                        res.json({
+                                            status: "failed",
+                                            message: "Please use a different email address or phone number"
+                                        })
+                                    } else {
+                                        req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
+                                        req.body.user = user._id;
+                                        createDefaultAvatar(req.body);
+                                        var new_temp_user = new TempUser({
+                                            userId: new_user._id,
+                                            verificationCode: Math.floor(Math.random() * 31245)
+                                        });
+                                        new_temp_user.save(function (err, tempuser) {
+                                            if (err) {
+                                                console.log(err)
+                                                res.json({
+                                                    status: "error",
+                                                    message: 'system error occured please try again later'
+                                                })
+                                            }
+                                            else {
+                                                console.log('user saved');
+                                                sendVerificationEMAIL(new_user.email, new_user.name, new_temp_user.verificationCode);
+                                                console.log("Temp user ID = " + tempuser._id);
+                                                res.json({
+                                                    status: 'success',
+                                                    message: 'your account has been created',
+                                                    userId: tempuser._id
+                                                });
+                                            }
+                                        })
+                                    }
                                 }
                             })
                         }
@@ -107,12 +114,8 @@ function sendVerificationEMAIL(email, name, verificationCode) {
         , altText: 'plain text'
     }, function (err, data, res) {
         if (err) {
-            console.log('There was an error in sende verification message /reg')
+            console.log('There was an error in send verification message /reg')
             console.log(err);
-            res.json({
-                status: "error",
-                message: 'system error occured please try again later'
-            })
         }
         else {
             console.log('verification email sent to user email')
