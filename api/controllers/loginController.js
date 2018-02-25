@@ -193,35 +193,6 @@ exports.verify_a_user = function (req, res) {
 
 }
 
-exports.create_a_user = function (req, res) {
-    var new_user = new User(req.body);
-    console.log(req.body);
-    new_user.save(function (err, user) {
-        if (err) res.json({ code: "11000", message: "Please use a different email address or phone number" })
-        else {
-            req.body.name = "Defaultious_" + Math.floor(Math.random() * 30000);
-            req.body.user = user._id;
-            createDefaultAvatar(req.body);
-            var new_temp_user = new TempUser({
-                userId: new_user._id,
-                verificationCode: Math.floor(Math.random() * 31245)
-            });
-            new_temp_user.save(function (err, tempuser) {
-                if (err) {
-                    console.log(err)
-                    res.send("There was an error please try again later");
-                }
-                else {
-                    console.log('user saved');
-                    sendVerificationEMAIL(new_user.email, new_user.name, new_temp_user.verificationCode);
-                    console.log("Temp user ID = " + tempuser._id);
-                    res.json(tempuser._id);
-                }
-            })
-        }
-    })
-}
-
 //for future implementation
 function sendVerificationSMS(phoneNumber, verificationCode) {
     var Tempuser = mongoose.model('TempUser');
@@ -243,32 +214,5 @@ function sendVerificationSMS(phoneNumber, verificationCode) {
         })
 }
 
-function sendVerificationEMAIL(email, name, verificationCode) {
-    var ses = require('node-ses')
-        , client = ses.createClient({ key: 'AKIAJPFFPZFHBRTUGSPA', secret: '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' });
-    // Give SES the details and let it construct the message for you.
-    client.sendEmail({
-        to: email
-        , from: 'hi.ooxet@outlook.com'
-        , subject: 'Verification Code'
-        , message: '<strong>Hi ' + name + ' </strong> <br> Thank you for registering with <strong>oOxet.com</strong><br>'
-            + 'This is your verification code '
-            + "<div style=' color: blue; width:100%; font-size:150%; border:solid grey 1px;'>" + verificationCode + "</div>"
-        , altText: 'plain text'
-    }, function (err, data, res) {
-        if (err) { console.log(err) }
-        else { console.log(data); }
-    });
-}
 
-function createDefaultAvatar(body) {
-    var new_avatar = new Avatar(body);
-    new_avatar.save(function (err, avatar) {
-        if (err)
-            res.send(err)
-        else {
-            console.log("Avatar has been created")
-            //res.json(avatar);
-        }
-    });
-}
+
