@@ -46,7 +46,7 @@ var UserSchema = new mongoose.Schema({
         default: Date.now,
         required: true
     }
-});
-
+})
+.index({ email: 1, phone: 1 })
 var User = mongoose.model('Users', UserSchema);
 module.exports = User;
