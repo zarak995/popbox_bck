@@ -14,25 +14,35 @@ var sms_config = {
     }
 };
 
+let error = {
+    status: "error",
+    message: 'system error occured please try again later'
+};
+
+let failed = {
+    status: 'failed',
+    message: 'username and/or password  is not valid'
+}
+
 var sender = new Sender(sms_config);
 exports.send_email = function (req, res) {
     TempUser.findById(req.body.userId, (err, tempuser) => {
         if (err) {
             console.log(err);
-            res.json({ status: 'error', message: 'system error occured please try again later' });
+            res.json(error)
         } else {
             if (tempuser == null) {
                 console.log("tempuser does not exist");
-                res.json({ status: 'failed', message: 'There was an error, please select resend again' });
+                res.json(failed)
             } else {
                 User.findById(tempuser.userId, (err, user) => {
                     if (err) {
                         console.log(err);
-                        res.json({ status: 'error', message: 'system error occured please try again later' });
+                        res.json(error)
                     } else {
                         if (user == null) {
                             console.log("user does not exist");
-                            res.json({ status: 'failed', message: 'There was an error, please select resend again' });
+                            res.json(failed)
                         } else {
                             var client = ses.createClient({ key: 'AKIAJPFFPZFHBRTUGSPA', secret: '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' });
                             client.sendEmail({
@@ -47,13 +57,13 @@ exports.send_email = function (req, res) {
                                 if (err) {
                                     console.log("Error on login/reg/resendEMAIL")
                                     console.log(err)
-                                    res.json({ status: 'error', message: 'system error occured please try again later' });
+                                    res.json(error)
                                 }
                                 else if (data != null) {
                                     res.json({ status: 'success', message: "verification code has been sent" });
                                     console.log("Request Complete on login/reg/resendEMail")
                                 } else {
-                                    res.json({ status: 'error', message: 'system error occured please try again later' });
+                                    res.json(error)
                                 }
                             })
                         }
@@ -68,20 +78,20 @@ exports.send_sms = function (req, res) {
     TempUser.findById(req.body.userId, (err, tempuser) => {
         if (err) {
             console.log(err);
-            res.json({ status: 'error', message: 'system error occured please try again later' });
+            res.json(error)
         } else {
             if (tempuser == null) {
                 console.log("tempuser does not Exist");
-                res.json({ status: 'failed', message: 'There was an error, please select resend again' });
+                res.json(failed)
             } else {
                 User.findById(tempuser.userId, (err, user) => {
                     if (err) {
                         console.log(err)
-                        res.send("There was an error");
+                        res.json(error)
                     } else {
                         if (user == null) {
                             console.log("User does not Exist");
-                            res.json({ status: 'failed', message: 'There was an error, please select resend again' });
+                            res.json(failed)
                         } else {
                             sender.sendSms(config.aws_verification_code_message_body + tempuser.verificationCode,
                                 config.aws_topic_sms, false, user.phone)
@@ -92,7 +102,7 @@ exports.send_sms = function (req, res) {
                                     console.log();
                                 })
                                 .catch(function (err) {
-                                    res.json({ status: 'error', message: 'system error occured please try again later' });
+                                    res.json(error)
                                     console.log("Error on login/reg/resendSMS")
                                     console.log(err)
                                 })
