@@ -9,6 +9,9 @@ var Post = mongoose.Schema({
         type: String,
         require: true
     },
+    reports: [
+        {type: Object}
+    ]
 });
 
 var ChatSchema = new mongoose.Schema({
