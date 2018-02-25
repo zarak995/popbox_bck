@@ -12,6 +12,6 @@ tempuserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+}).index({ userId: 1, _id: 1 })
 var TempUser = mongoose.model("TempUser", tempuserSchema);
 exports.model = TempUser;
