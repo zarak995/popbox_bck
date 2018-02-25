@@ -2,12 +2,24 @@ var moment = require('moment');
 var mongoose = require('mongoose');
 var Chat = mongoose.model('Chats');
 
+let error = {
+    status: "error",
+    message: 'system error occured please try again later'
+};
+
+let failed = {
+    status: 'failed',
+    message: 'username and/or password  is not valid'
+}
 exports.list_top_chats = function (req, res) {
     Chat.find().sort({ post: -1 }).limit(15)
         .populate({ path: 'likes', model: 'Avatars' })
         .populate({ path: 'owner', model: 'Avatars' })
         .exec((err, chat) => {
-            if (err) res.send(err);
+            if (err) {
+                console.log(err)
+                res.json(error)
+            }
             else {
                 res.json(chat)
             }
@@ -19,7 +31,10 @@ exports.list_all_chats = function (req, res) {
         .populate({ path: 'owner', model: 'Avatars' })
         .populate({ path: 'reports', model: 'Avatars' })
         .exec((err, chat) => {
-            if (err) res.send(err);
+            if (err) {
+                console.log(err)
+                res.json(error)
+            }
             else {
                 res.json(chat)
             }
@@ -38,8 +53,10 @@ exports.view_a_chat = function (req, res) {
             }
         })
         .exec((err, chat) => {
-            if (err) res.send(err);
-            else {
+            if (err) {
+                console.log(err)
+                res.json(error)
+            } else {
                 res.json(chat)
             }
         })
@@ -47,8 +64,10 @@ exports.view_a_chat = function (req, res) {
 exports.create_a_chat = function (req, res) {
     var new_chat = new Chat(req.body);
     new_chat.save(function (err, chat) {
-        if (err)
-            res.send(err)
+        if (err) {
+            console.log(err)
+            res.json(error)
+        }
         else {
             req.params.chatId = chat._id;
             module.exports.view_a_chat(req, res);
@@ -73,7 +92,10 @@ exports.update_a_chat = function (req, res) {
             }
         })
         .exec((err, chat) => {
-            if (err) res.send(err);
+            if (err) {
+                console.log(err)
+                res.json(error)
+            }
             else {
                 req.params.chatId = chat._id;
                 module.exports.view_a_chat(req, res)
@@ -84,7 +106,8 @@ exports.delete_a_chat = function (req, res) {
     Chat.findByIdAndRemove({ _id: req.params.chatId })
         .exec(function (err, chat) {
             if (err) {
-                res.send(err)
+                console.log(err)
+                res.json(error)
             }
             else {
                 res.json(chat);
@@ -98,7 +121,8 @@ exports.user_chats = function (req, res) {
         .populate({ path: 'reports', model: 'Avatars' })
         .exec((err, list) => {
             if (err) {
-                res.send("There was a problem, please try again later");
+                console.log(err)
+                res.json(error)
             }
             else {
                 let maxLength = list.length;
