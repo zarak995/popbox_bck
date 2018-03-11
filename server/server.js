@@ -6,7 +6,7 @@ require('../api/models/tempuser');
 
 var mongoose = require('mongoose');
 console.log(mongoose.connection.readyState);
-var env = process.env.NODE_ENV || 'production';
+var env = process.env.NODE_ENV || 'development';
 
 var config = require('../env/config')[env];
 var express = require('express'),
@@ -31,6 +31,7 @@ var avatarRouter = require('../api/routes/avatarRoutes');
 var userRoutes = require('../api/routes/userRoutes'); //importing route
 var loginRouter = require('../api/routes/loginRoutes');
 var postRouter = require('../api/routes/postRoutes');
+var registerRoutes = require('../api/routes/registerRoutes');
 
 var app = express();
 //Passport Authentication strategy
@@ -62,6 +63,7 @@ app.listen(port);
 console.log('todo list RESTful API server started on: ' + port);
 //..............These should be protected by jwt...............
 loginRouter(app);
+registerRoutes(app);
 userRoutes(app, isLoggedIn()); //register the route
 avatarRouter(app, isLoggedIn());
 postRouter(app, isLoggedIn());
